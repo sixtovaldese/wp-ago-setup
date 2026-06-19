@@ -1,4 +1,3 @@
-/* aGo Setup Admin JS */
 (function () {
     'use strict';
 
@@ -14,7 +13,6 @@
 
     if (!runBtn) return;
 
-    // Select all / none
     selectAll.addEventListener('click', function () {
         $$('.ago-task input[type="checkbox"]').forEach(function (cb) { cb.checked = true; });
     });
@@ -23,7 +21,6 @@
         $$('.ago-task input[type="checkbox"]').forEach(function (cb) { cb.checked = false; });
     });
 
-    // Run setup
     runBtn.addEventListener('click', function () {
         var tasks = {};
         var checked = false;
@@ -42,7 +39,6 @@
             return;
         }
 
-        // Add timezone value if timezone task is selected
         if (tasks.set_timezone) {
             var tzSelect = $('#ago-timezone-select');
             if (tzSelect) {
@@ -50,7 +46,6 @@
             }
         }
 
-        // Clear previous status
         $$('.ago-task-status').forEach(function (s) {
             s.textContent = '';
             s.className = 'ago-task-status';
@@ -60,11 +55,11 @@
         runBtn.textContent = 'Running…';
         resultBox.style.display = 'none';
 
-        fetch(agoSetup.restUrl + '/run', {
+        fetch(agosetupData.restUrl + '/run', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-WP-Nonce': agoSetup.nonce,
+                'X-WP-Nonce': agosetupData.nonce,
             },
             body: JSON.stringify(tasks),
         })
@@ -110,21 +105,20 @@
         });
     });
 
-    // Deactivate plugin
     if (deactivateBtn) {
         deactivateBtn.addEventListener('click', function () {
             deactivateBtn.disabled = true;
             deactivateBtn.textContent = 'Deactivating…';
 
-            fetch(agoSetup.restUrl + '/deactivate', {
+            fetch(agosetupData.restUrl + '/deactivate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': agoSetup.nonce,
+                    'X-WP-Nonce': agosetupData.nonce,
                 },
             })
             .then(function () {
-                window.location.href = agoSetup.adminUrl + 'plugins.php?deactivate=true';
+                window.location.href = agosetupData.adminUrl + 'plugins.php?deactivate=true';
             })
             .catch(function () {
                 deactivateBtn.disabled = false;

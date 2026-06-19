@@ -23,16 +23,16 @@ class Plugin {
     }
 
     public function load_textdomain(): void {
-        load_plugin_textdomain( 'ago-setup', false, dirname( plugin_basename( AGO_SETUP_FILE ) ) . '/languages' );
+        load_plugin_textdomain( 'ago-setup', false, dirname( plugin_basename( AGOSETUP_FILE ) ) . '/languages' );
     }
 
     public function register_admin_menu(): void {
-        if ( empty( $GLOBALS['admin_page_hooks']['ago-tools'] ) ) {
+        if ( empty( $GLOBALS['admin_page_hooks']['agolab-tools'] ) ) {
             add_menu_page(
                 __( 'aGo Tools', 'ago-setup' ),
                 __( 'aGo Tools', 'ago-setup' ),
                 'manage_options',
-                'ago-tools',
+                'agolab-tools',
                 '__return_null',
                 'dashicons-hammer',
                 81
@@ -40,15 +40,15 @@ class Plugin {
         }
 
         add_submenu_page(
-            'ago-tools',
+            'agolab-tools',
             __( 'aGo First Run', 'ago-setup' ),
             __( 'First Run', 'ago-setup' ),
             'manage_options',
-            'ago-setup',
+            'agosetup',
             [ Admin\Page::class, 'render' ]
         );
 
-        remove_submenu_page( 'ago-tools', 'ago-tools' );
+        remove_submenu_page( 'agolab-tools', 'agolab-tools' );
     }
 
     public function register_rest_routes(): void {
@@ -78,6 +78,9 @@ class Plugin {
     }
 
     public function handle_status(): \WP_REST_Response {
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
         return new \WP_REST_Response( [
             'hello_world'    => ! empty( get_page_by_path( 'hello-world', OBJECT, 'post' ) ),
             'sample_page'    => ! empty( get_page_by_path( 'sample-page', OBJECT, 'page' ) ),
@@ -165,31 +168,31 @@ class Plugin {
     }
 
     public function handle_deactivate(): \WP_REST_Response {
-        deactivate_plugins( plugin_basename( AGO_SETUP_FILE ) );
+        deactivate_plugins( plugin_basename( AGOSETUP_FILE ) );
         return new \WP_REST_Response( [ 'deactivated' => true ] );
     }
 
     public function enqueue_assets( string $hook ): void {
-        if ( ! str_ends_with( $hook, '_page_ago-setup' ) ) {
+        if ( ! str_ends_with( $hook, '_page_agosetup' ) ) {
             return;
         }
 
         wp_enqueue_style(
-            'ago-setup-admin',
-            AGO_SETUP_URL . 'assets/css/admin.css',
+            'agosetup-admin',
+            AGOSETUP_URL . 'assets/css/admin.css',
             [],
-            AGO_SETUP_VERSION
+            AGOSETUP_VERSION
         );
 
         wp_enqueue_script(
-            'ago-setup-admin',
-            AGO_SETUP_URL . 'assets/js/admin.js',
+            'agosetup-admin',
+            AGOSETUP_URL . 'assets/js/admin.js',
             [],
-            AGO_SETUP_VERSION,
+            AGOSETUP_VERSION,
             true
         );
 
-        wp_localize_script( 'ago-setup-admin', 'agoSetup', [
+        wp_localize_script( 'agosetup-admin', 'agosetupData', [
             'restUrl' => rest_url( 'ago-setup/v1' ),
             'nonce'   => wp_create_nonce( 'wp_rest' ),
             'adminUrl' => admin_url(),

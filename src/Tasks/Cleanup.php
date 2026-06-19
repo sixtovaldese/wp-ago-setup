@@ -6,6 +6,15 @@ defined( 'ABSPATH' ) || exit;
 
 class Cleanup {
 
+    private static function ensure_plugin_api(): void {
+        if ( ! function_exists( 'is_plugin_active' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        }
+        if ( ! function_exists( 'delete_plugins' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
+    }
+
     public static function delete_hello_world(): array {
         $post = get_page_by_path( 'hello-world', OBJECT, 'post' );
         if ( ! $post ) {
@@ -47,6 +56,7 @@ class Cleanup {
     }
 
     public static function delete_hello_dolly(): array {
+        self::ensure_plugin_api();
         $plugin_file = 'hello.php';
         $plugin_path = WP_PLUGIN_DIR . '/' . $plugin_file;
 
@@ -67,6 +77,7 @@ class Cleanup {
     }
 
     public static function delete_akismet(): array {
+        self::ensure_plugin_api();
         $plugin_file = 'akismet/akismet.php';
         $plugin_path = WP_PLUGIN_DIR . '/akismet/akismet.php';
 
@@ -126,6 +137,7 @@ class Cleanup {
         global $wpdb;
 
         $now = time();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $expired = $wpdb->query( $wpdb->prepare(
             "DELETE a, b FROM {$wpdb->options} a, {$wpdb->options} b
              WHERE a.option_name LIKE %s
@@ -137,12 +149,14 @@ class Cleanup {
             $now
         ) );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $orphan_rels = $wpdb->query(
             "DELETE tr FROM {$wpdb->term_relationships} tr
              LEFT JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
              WHERE tt.term_taxonomy_id IS NULL"
         );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $orphan_meta = $wpdb->query(
             "DELETE pm FROM {$wpdb->postmeta} pm
              LEFT JOIN {$wpdb->posts} p ON pm.post_id = p.ID

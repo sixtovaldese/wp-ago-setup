@@ -12,15 +12,14 @@ class Page {
         ?>
         <div class="wrap">
             <h1>
-                <img src="<?php echo esc_url( AGO_SETUP_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:28px;width:auto;vertical-align:middle;margin-right:8px">
+                <img src="<?php echo esc_url( AGOSETUP_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:28px;width:auto;vertical-align:middle;margin-right:8px">
                 <?php esc_html_e( 'aGo First Run', 'ago-setup' ); ?>
-                <span style="font-size:12px;color:#999;margin-left:8px">v<?php echo esc_html( AGO_SETUP_VERSION ); ?></span>
+                <span style="font-size:12px;color:#999;margin-left:8px">v<?php echo esc_html( AGOSETUP_VERSION ); ?></span>
             </h1>
 
             <div class="ago-layout">
                 <div class="ago-main">
 
-                    <!-- Intro -->
                     <div class="card ago-card ago-intro">
                         <h2><?php esc_html_e( 'Fresh WordPress install? Get it ready in one click.', 'ago-setup' ); ?></h2>
                         <p>
@@ -31,12 +30,10 @@ class Page {
                         </p>
                     </div>
 
-                    <!-- Wizard -->
                     <div class="card ago-card">
                         <h2><?php esc_html_e( 'First Run Wizard', 'ago-setup' ); ?></h2>
                         <p><?php esc_html_e( 'Select the tasks you want to run and click "Run". Each task is independent.', 'ago-setup' ); ?></p>
 
-                        <!-- Cleanup -->
                         <div class="ago-section">
                             <h3><?php esc_html_e( 'Cleanup', 'ago-setup' ); ?></h3>
                             <label class="ago-task">
@@ -76,7 +73,6 @@ class Page {
                             </label>
                         </div>
 
-                        <!-- Settings -->
                         <div class="ago-section">
                             <h3><?php esc_html_e( 'Settings', 'ago-setup' ); ?></h3>
                             <label class="ago-task">
@@ -148,7 +144,6 @@ class Page {
                         <div id="ago-setup-result" style="display:none"></div>
                     </div>
 
-                    <!-- Complete & Deactivate -->
                     <div class="card ago-card" id="ago-deactivate-card" style="display:none">
                         <h2><?php esc_html_e( 'All done!', 'ago-setup' ); ?></h2>
                         <p><?php esc_html_e( 'Setup complete. You can deactivate this plugin, it has served its purpose.', 'ago-setup' ); ?></p>
@@ -157,7 +152,6 @@ class Page {
                         </button>
                     </div>
 
-                    <!-- Recommend other aGo plugins -->
                     <div class="card ago-card">
                         <h2><?php esc_html_e( 'Recommended aGo Plugins', 'ago-setup' ); ?></h2>
                         <p><?php esc_html_e( 'Continue optimizing your WordPress site with these free plugins:', 'ago-setup' ); ?></p>
@@ -169,7 +163,7 @@ class Page {
                                 <strong>aGo Harden</strong>, <?php esc_html_e( 'Security hardening in one click', 'ago-setup' ); ?>
                             </li>
                             <li>
-                                <strong>aGo SMTP</strong>, <?php esc_html_e( 'Fix email delivery with SMTP', 'ago-setup' ); ?>
+                                <strong>aGo Mail Pilot</strong>, <?php esc_html_e( 'Fix email delivery with SMTP', 'ago-setup' ); ?>
                             </li>
                             <li>
                                 <strong>aGo Disable</strong>, <?php esc_html_e( 'Disable Gutenberg, comments, auto-updates…', 'ago-setup' ); ?>
@@ -194,10 +188,17 @@ class Page {
 
                 </div>
 
-                <!-- SIDEBAR -->
                 <div class="ago-sidebar">
 
-                    <!-- About -->
+                    <div class="card ago-card">
+                        <h3><?php esc_html_e( 'Quick links', 'ago-setup' ); ?></h3>
+                        <ul class="ago-features" style="list-style:none;padding:0;margin:0">
+                            <li><a href="https://wordpress.org/documentation/" target="_blank" rel="noopener"><?php esc_html_e( 'WordPress documentation', 'ago-setup' ); ?></a></li>
+                            <li><a href="https://pagespeed.web.dev/" target="_blank" rel="noopener"><?php esc_html_e( 'Speed test (PageSpeed)', 'ago-setup' ); ?></a></li>
+                            <li><a href="https://www.ssllabs.com/ssltest/" target="_blank" rel="noopener"><?php esc_html_e( 'SSL test (SSL Labs)', 'ago-setup' ); ?></a></li>
+                        </ul>
+                    </div>
+
                     <div class="card ago-card">
                         <h3><?php esc_html_e( 'About', 'ago-setup' ); ?></h3>
                         <p style="font-size:13px;color:#666">
@@ -216,7 +217,6 @@ class Page {
                         </ul>
                     </div>
 
-                    <!-- Donation -->
                     <div class="card ago-card ago-donation">
                         <h3><?php esc_html_e( 'Support Open Source', 'ago-setup' ); ?></h3>
                         <p style="font-size:13px;color:#666">
@@ -236,10 +236,9 @@ class Page {
                         </p>
                     </div>
 
-                    <!-- Footer with logo -->
                     <div class="ago-footer">
                         <a href="https://ago.cl" target="_blank" rel="noopener" class="ago-footer-logo">
-                            <img src="<?php echo esc_url( AGO_SETUP_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:40px;width:auto">
+                            <img src="<?php echo esc_url( AGOSETUP_URL . 'assets/img/agolab.webp' ); ?>" alt="aGo Lab" style="height:40px;width:auto">
                         </a>
                         <p>
                             <?php
