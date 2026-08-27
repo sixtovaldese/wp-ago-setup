@@ -3,6 +3,7 @@ defined( 'ABSPATH' ) || exit;
 
 return ['x-generator'=>'aGo Setup','translation-revision-date'=>'2026-03-17','plural-forms'=>'nplurals=2; plural=n != 1;','project-id-version'=>'aGo Setup 1.0.0','language'=>'es','messages'=>[
 'Quick links'=>'Enlaces rápidos',
+'Documentation'=>'Documentación',
 'WordPress documentation'=>'Documentación de WordPress',
 'Speed test (PageSpeed)'=>'Test de velocidad (PageSpeed)',
 'SSL test (SSL Labs)'=>'Test SSL (SSL Labs)',

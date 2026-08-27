@@ -193,6 +193,7 @@ class Page {
                     <div class="card ago-card">
                         <h3><?php esc_html_e( 'Quick links', 'ago-setup' ); ?></h3>
                         <ul class="ago-features" style="list-style:none;padding:0;margin:0">
+                            <li><a href="https://ago.cl/herramientas/wordpress/ago-setup/docs" target="_blank" rel="noopener"><?php esc_html_e( 'Documentation', 'ago-setup' ); ?></a></li>
                             <li><a href="https://wordpress.org/documentation/" target="_blank" rel="noopener"><?php esc_html_e( 'WordPress documentation', 'ago-setup' ); ?></a></li>
                             <li><a href="https://pagespeed.web.dev/" target="_blank" rel="noopener"><?php esc_html_e( 'Speed test (PageSpeed)', 'ago-setup' ); ?></a></li>
                             <li><a href="https://www.ssllabs.com/ssltest/" target="_blank" rel="noopener"><?php esc_html_e( 'SSL test (SSL Labs)', 'ago-setup' ); ?></a></li>
