@@ -13,9 +13,10 @@ class Comments {
 
         // Close comments on all existing posts
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->update( $wpdb->posts, [ 'comment_status' => 'closed' ], [ 'comment_status' => 'open' ] );
 
-        return [ 'ok' => true, 'msg' => 'Comments disabled globally' ];
+        return [ 'ok' => true, 'msg' => __( 'Comments disabled globally', 'ago-setup' ) ];
     }
 
     public static function disable_pingbacks(): array {
@@ -23,8 +24,9 @@ class Comments {
 
         // Close pingbacks on all existing posts
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
         $wpdb->update( $wpdb->posts, [ 'ping_status' => 'closed' ], [ 'ping_status' => 'open' ] );
 
-        return [ 'ok' => true, 'msg' => 'Pingbacks/trackbacks disabled globally' ];
+        return [ 'ok' => true, 'msg' => __( 'Pingbacks and trackbacks disabled globally', 'ago-setup' ) ];
     }
 }

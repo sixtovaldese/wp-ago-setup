@@ -2,7 +2,7 @@
 /**
  * Plugin Name: aGo First Run
  * Plugin URI:  https://ago.cl/herramientas/
- * Description: First-run wizard for fresh WordPress installs. Clean demo content, set permalinks, timezone and language, create essential pages (Privacy, Contact, About), remove unused themes, clean transients and orphan terms, in one click.
+ * Description: First-run wizard for fresh WordPress installs. Clean demo content, set permalinks and timezone, create essential pages (Privacy, Contact, About), remove unused themes, clean expired transients and orphan rows, in one click.
  * Version:     1.0.0
  * Requires at least: 6.0
  * Requires PHP: 8.1
@@ -11,7 +11,6 @@
  * License:     GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: ago-setup
- * Domain Path: /languages
  */
 
 defined( 'ABSPATH' ) || exit;

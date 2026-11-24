@@ -8,6 +8,32 @@ class Plugin {
 
     private static ?self $instance = null;
 
+    private const REST_NAMESPACE = 'agosetup/v1';
+
+    private const MENU_SLUG = 'agosetup-tools';
+
+    /**
+     * Each task the wizard can run, keyed by the name the admin screen sends.
+     * A task runs only when the request names it with a true value.
+     */
+    private const TASKS = [
+        'delete_hello_world'     => [ Tasks\Cleanup::class, 'delete_hello_world' ],
+        'delete_sample_page'     => [ Tasks\Cleanup::class, 'delete_sample_page' ],
+        'delete_sample_comment'  => [ Tasks\Cleanup::class, 'delete_sample_comment' ],
+        'delete_hello_dolly'     => [ Tasks\Cleanup::class, 'delete_hello_dolly' ],
+        'delete_akismet'         => [ Tasks\Cleanup::class, 'delete_akismet' ],
+        'set_permalinks'         => [ Tasks\Settings::class, 'set_permalinks' ],
+        'disable_comments'       => [ Tasks\Comments::class, 'disable_comments' ],
+        'disable_pingbacks'      => [ Tasks\Comments::class, 'disable_pingbacks' ],
+        'discourage_search'      => [ Tasks\Settings::class, 'discourage_search_engines' ],
+        'clean_dashboard'        => [ Tasks\Settings::class, 'clean_dashboard_widgets' ],
+        'create_privacy_page'    => [ Tasks\Settings::class, 'create_privacy_page' ],
+        'delete_unused_themes'   => [ Tasks\Cleanup::class, 'delete_unused_themes' ],
+        'create_essential_pages' => [ Tasks\Settings::class, 'create_essential_pages' ],
+        'set_static_front_page'  => [ Tasks\Settings::class, 'set_static_front_page' ],
+        'clean_transients'       => [ Tasks\Cleanup::class, 'clean_transients_and_orphans' ],
+    ];
+
     public static function instance(): self {
         if ( null === self::$instance ) {
             self::$instance = new self();
@@ -16,23 +42,29 @@ class Plugin {
     }
 
     private function __construct() {
-        add_action( 'init', [ $this, 'load_textdomain' ] );
         add_action( 'admin_menu', [ $this, 'register_admin_menu' ] );
         add_action( 'rest_api_init', [ $this, 'register_rest_routes' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
     }
 
-    public function load_textdomain(): void {
-        load_plugin_textdomain( 'ago-setup', false, dirname( plugin_basename( AGOSETUP_FILE ) ) . '/languages' );
-    }
-
     public function register_admin_menu(): void {
-        if ( empty( $GLOBALS['admin_page_hooks']['agolab-tools'] ) ) {
+        /*
+         * Other plugins from the same author may already have added a shared
+         * parent menu. When one is there the page goes under it, so the
+         * dashboard does not grow a second top level entry for the same set of
+         * tools. When there is none, this plugin creates its own parent under
+         * its own prefix and never defines the shared slug.
+         */
+        $parent = 'agolab-tools';
+
+        if ( empty( $GLOBALS['admin_page_hooks'][ $parent ] ) ) {
+            $parent = self::MENU_SLUG;
+
             add_menu_page(
                 __( 'aGo Tools', 'ago-setup' ),
                 __( 'aGo Tools', 'ago-setup' ),
                 'manage_options',
-                'agolab-tools',
+                $parent,
                 '__return_null',
                 'dashicons-hammer',
                 81
@@ -40,7 +72,7 @@ class Plugin {
         }
 
         add_submenu_page(
-            'agolab-tools',
+            $parent,
             __( 'aGo First Run', 'ago-setup' ),
             __( 'First Run', 'ago-setup' ),
             'manage_options',
@@ -48,127 +80,62 @@ class Plugin {
             [ Admin\Page::class, 'render' ]
         );
 
-        remove_submenu_page( 'agolab-tools', 'agolab-tools' );
+        remove_submenu_page( $parent, $parent );
     }
 
     public function register_rest_routes(): void {
-        register_rest_route( 'ago-setup/v1', '/run', [
+        register_rest_route( self::REST_NAMESPACE, '/run', [
             'methods'             => 'POST',
             'callback'            => [ $this, 'handle_run' ],
-            'permission_callback' => function () {
-                return current_user_can( 'manage_options' );
-            },
+            'permission_callback' => static fn () => current_user_can( 'manage_options' ),
         ] );
 
-        register_rest_route( 'ago-setup/v1', '/deactivate', [
+        register_rest_route( self::REST_NAMESPACE, '/deactivate', [
             'methods'             => 'POST',
             'callback'            => [ $this, 'handle_deactivate' ],
-            'permission_callback' => function () {
-                return current_user_can( 'manage_options' );
-            },
-        ] );
-
-        register_rest_route( 'ago-setup/v1', '/status', [
-            'methods'             => 'GET',
-            'callback'            => [ $this, 'handle_status' ],
-            'permission_callback' => function () {
-                return current_user_can( 'manage_options' );
-            },
-        ] );
-    }
-
-    public function handle_status(): \WP_REST_Response {
-        if ( ! function_exists( 'is_plugin_active' ) ) {
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
-        }
-        return new \WP_REST_Response( [
-            'hello_world'    => ! empty( get_page_by_path( 'hello-world', OBJECT, 'post' ) ),
-            'sample_page'    => ! empty( get_page_by_path( 'sample-page', OBJECT, 'page' ) ),
-            'hello_dolly'    => file_exists( WP_PLUGIN_DIR . '/hello.php' ),
-            'akismet'        => file_exists( WP_PLUGIN_DIR . '/akismet/akismet.php' ) && ! is_plugin_active( 'akismet/akismet.php' ),
-            'permalinks'     => get_option( 'permalink_structure' ) !== '/%postname%/',
-            'comments'       => get_option( 'default_comment_status' ) !== 'closed',
-            'pingbacks'      => get_option( 'default_ping_status' ) !== 'closed',
-            'timezone'       => get_option( 'timezone_string', '' ),
-            'search_engines' => (int) get_option( 'blog_public', 1 ) === 1,
-            'privacy_page'   => empty( get_option( 'wp_page_for_privacy_policy' ) ),
+            'permission_callback' => [ $this, 'can_deactivate' ],
         ] );
     }
 
     public function handle_run( \WP_REST_Request $request ): \WP_REST_Response {
-        $tasks   = $request->get_json_params();
+        $tasks   = (array) $request->get_json_params();
         $results = [];
 
-        if ( ! empty( $tasks['delete_hello_world'] ) ) {
-            $results['delete_hello_world'] = Tasks\Cleanup::delete_hello_world();
-        }
-
-        if ( ! empty( $tasks['delete_sample_page'] ) ) {
-            $results['delete_sample_page'] = Tasks\Cleanup::delete_sample_page();
-        }
-
-        if ( ! empty( $tasks['delete_sample_comment'] ) ) {
-            $results['delete_sample_comment'] = Tasks\Cleanup::delete_sample_comment();
-        }
-
-        if ( ! empty( $tasks['delete_hello_dolly'] ) ) {
-            $results['delete_hello_dolly'] = Tasks\Cleanup::delete_hello_dolly();
-        }
-
-        if ( ! empty( $tasks['delete_akismet'] ) ) {
-            $results['delete_akismet'] = Tasks\Cleanup::delete_akismet();
-        }
-
-        if ( ! empty( $tasks['set_permalinks'] ) ) {
-            $results['set_permalinks'] = Tasks\Settings::set_permalinks();
-        }
-
-        if ( ! empty( $tasks['disable_comments'] ) ) {
-            $results['disable_comments'] = Tasks\Comments::disable_comments();
-        }
-
-        if ( ! empty( $tasks['disable_pingbacks'] ) ) {
-            $results['disable_pingbacks'] = Tasks\Comments::disable_pingbacks();
+        foreach ( self::TASKS as $key => $callback ) {
+            if ( empty( $tasks[ $key ] ) ) {
+                continue;
+            }
+            $results[ $key ] = call_user_func( $callback );
         }
 
         if ( ! empty( $tasks['set_timezone'] ) ) {
-            $tz = sanitize_text_field( $tasks['timezone_value'] ?? 'UTC' );
+            $tz = sanitize_text_field( wp_unslash( (string) ( $tasks['timezone_value'] ?? 'UTC' ) ) );
             $results['set_timezone'] = Tasks\Settings::set_timezone( $tz );
-        }
-
-        if ( ! empty( $tasks['discourage_search'] ) ) {
-            $results['discourage_search'] = Tasks\Settings::discourage_search_engines();
-        }
-
-        if ( ! empty( $tasks['clean_dashboard'] ) ) {
-            $results['clean_dashboard'] = Tasks\Settings::clean_dashboard_widgets();
-        }
-
-        if ( ! empty( $tasks['create_privacy_page'] ) ) {
-            $results['create_privacy_page'] = Tasks\Settings::create_privacy_page();
-        }
-
-        if ( ! empty( $tasks['delete_unused_themes'] ) ) {
-            $results['delete_unused_themes'] = Tasks\Cleanup::delete_unused_themes();
-        }
-
-        if ( ! empty( $tasks['create_essential_pages'] ) ) {
-            $results['create_essential_pages'] = Tasks\Settings::create_essential_pages();
-        }
-
-        if ( ! empty( $tasks['set_static_front_page'] ) ) {
-            $results['set_static_front_page'] = Tasks\Settings::set_static_front_page();
-        }
-
-        if ( ! empty( $tasks['clean_transients'] ) ) {
-            $results['clean_transients'] = Tasks\Cleanup::clean_transients_and_orphans();
         }
 
         return new \WP_REST_Response( [ 'results' => $results ] );
     }
 
+    /**
+     * Who may turn this plugin off: the plugin-specific deactivate_plugin
+     * capability, and on multisite a network-active copy only by someone who
+     * manages network plugins, as on the Network Admin plugins screen.
+     */
+    public function can_deactivate(): bool {
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        $file = plugin_basename( AGOSETUP_FILE );
+
+        if ( is_multisite() && is_plugin_active_for_network( $file ) ) {
+            return current_user_can( 'manage_network_plugins' );
+        }
+
+        return current_user_can( 'deactivate_plugin', $file );
+    }
+
     public function handle_deactivate(): \WP_REST_Response {
-        deactivate_plugins( plugin_basename( AGOSETUP_FILE ) );
+        require_once ABSPATH . 'wp-admin/includes/plugin.php';
+        $file = plugin_basename( AGOSETUP_FILE );
+        deactivate_plugins( $file, false, is_multisite() && is_plugin_active_for_network( $file ) );
         return new \WP_REST_Response( [ 'deactivated' => true ] );
     }
 
@@ -193,9 +160,20 @@ class Plugin {
         );
 
         wp_localize_script( 'agosetup-admin', 'agosetupData', [
-            'restUrl' => rest_url( 'ago-setup/v1' ),
-            'nonce'   => wp_create_nonce( 'wp_rest' ),
+            'restUrl'  => rest_url( self::REST_NAMESPACE ),
+            'nonce'    => wp_create_nonce( 'wp_rest' ),
             'adminUrl' => admin_url(),
+            'i18n'     => [
+                'noTask'       => __( 'Please select at least one task.', 'ago-setup' ),
+                'running'      => __( 'Running...', 'ago-setup' ),
+                'run'          => __( 'Run', 'ago-setup' ),
+                /* translators: %d: number of tasks that ran */
+                'done'         => __( 'Tasks completed: %d', 'ago-setup' ),
+                'issues'       => __( 'Some tasks had issues. Check the status next to each task.', 'ago-setup' ),
+                'error'        => __( 'The request failed:', 'ago-setup' ),
+                'deactivating' => __( 'Deactivating...', 'ago-setup' ),
+                'deactivate'   => __( 'Complete & Deactivate Plugin', 'ago-setup' ),
+            ],
         ] );
     }
 }

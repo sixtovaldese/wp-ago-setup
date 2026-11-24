@@ -2,6 +2,8 @@
 
 namespace AgoLab\Setup\Admin;
 
+use AgoLab\Setup\Tasks\Cleanup;
+
 defined( 'ABSPATH' ) || exit;
 
 class Page {
@@ -38,19 +40,20 @@ class Page {
                             <h3><?php esc_html_e( 'Cleanup', 'ago-setup' ); ?></h3>
                             <label class="ago-task">
                                 <input type="checkbox" name="delete_hello_world" checked>
-                                <?php esc_html_e( 'Delete "Hello World" post', 'ago-setup' ); ?>
+                                <?php esc_html_e( 'Move the "Hello World" post to the trash', 'ago-setup' ); ?>
                                 <span class="ago-task-status" data-task="delete_hello_world"></span>
                             </label>
                             <label class="ago-task">
                                 <input type="checkbox" name="delete_sample_page" checked>
-                                <?php esc_html_e( 'Delete "Sample Page"', 'ago-setup' ); ?>
+                                <?php esc_html_e( 'Move the "Sample Page" to the trash', 'ago-setup' ); ?>
                                 <span class="ago-task-status" data-task="delete_sample_page"></span>
                             </label>
                             <label class="ago-task">
                                 <input type="checkbox" name="delete_sample_comment" checked>
-                                <?php esc_html_e( 'Delete sample comment', 'ago-setup' ); ?>
+                                <?php esc_html_e( 'Move the sample comment to the trash', 'ago-setup' ); ?>
                                 <span class="ago-task-status" data-task="delete_sample_comment"></span>
                             </label>
+                            <?php if ( Cleanup::can_delete_plugins() ) : ?>
                             <label class="ago-task">
                                 <input type="checkbox" name="delete_hello_dolly" checked>
                                 <?php esc_html_e( 'Delete Hello Dolly plugin', 'ago-setup' ); ?>
@@ -61,11 +64,14 @@ class Page {
                                 <?php esc_html_e( 'Delete Akismet (only if inactive)', 'ago-setup' ); ?>
                                 <span class="ago-task-status" data-task="delete_akismet"></span>
                             </label>
+                            <?php endif; ?>
+                            <?php if ( Cleanup::can_delete_themes() ) : ?>
                             <label class="ago-task">
                                 <input type="checkbox" name="delete_unused_themes">
                                 <?php esc_html_e( 'Delete unused themes (keep only the active one)', 'ago-setup' ); ?>
                                 <span class="ago-task-status" data-task="delete_unused_themes"></span>
                             </label>
+                            <?php endif; ?>
                             <label class="ago-task">
                                 <input type="checkbox" name="clean_transients">
                                 <?php esc_html_e( 'Clean expired transients and orphan database rows', 'ago-setup' ); ?>
@@ -157,7 +163,7 @@ class Page {
                         <p><?php esc_html_e( 'Continue optimizing your WordPress site with these free plugins:', 'ago-setup' ); ?></p>
                         <ul class="ago-recommendations">
                             <li>
-                                <strong>aGo Cleanup</strong>, <?php esc_html_e( 'Remove WordPress bloat (emojis, embeds, XML-RPC…)', 'ago-setup' ); ?>
+                                <strong>aGo Cleanup</strong>, <?php esc_html_e( 'Remove WordPress bloat (emojis, embeds, XML-RPC...)', 'ago-setup' ); ?>
                             </li>
                             <li>
                                 <strong>aGo Harden</strong>, <?php esc_html_e( 'Security hardening in one click', 'ago-setup' ); ?>
@@ -166,7 +172,7 @@ class Page {
                                 <strong>aGo Mail Pilot</strong>, <?php esc_html_e( 'Fix email delivery with SMTP', 'ago-setup' ); ?>
                             </li>
                             <li>
-                                <strong>aGo Disable</strong>, <?php esc_html_e( 'Disable Gutenberg, comments, auto-updates…', 'ago-setup' ); ?>
+                                <strong>aGo Disable</strong>, <?php esc_html_e( 'Disable Gutenberg, comments, auto-updates...', 'ago-setup' ); ?>
                             </li>
                             <li>
                                 <strong>aGo Media</strong>, <?php esc_html_e( 'Auto WebP conversion & image optimization', 'ago-setup' ); ?>
@@ -206,7 +212,7 @@ class Page {
                             <?php esc_html_e( 'First-run wizard for fresh WordPress installs. Use once, then deactivate.', 'ago-setup' ); ?>
                         </p>
                         <ul class="ago-features">
-                            <li><?php esc_html_e( 'Delete demo content', 'ago-setup' ); ?></li>
+                            <li><?php esc_html_e( 'Remove demo content', 'ago-setup' ); ?></li>
                             <li><?php esc_html_e( 'Remove default plugins', 'ago-setup' ); ?></li>
                             <li><?php esc_html_e( 'Delete unused themes', 'ago-setup' ); ?></li>
                             <li><?php esc_html_e( 'Configure permalinks & timezone', 'ago-setup' ); ?></li>

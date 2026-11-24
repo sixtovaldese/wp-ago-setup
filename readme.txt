@@ -3,7 +3,7 @@ Contributors: agolab
 Donate link: https://paypal.me/sixtovaldes
 Tags: setup wizard, post-install, clean install, permalinks, defaults
 Requires at least: 6.0
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.1
 Stable tag: 1.0.0
 License: GPL-2.0-or-later
@@ -15,23 +15,30 @@ Post-install wizard for WordPress: clean demo content, set permalinks, disable c
 
 aGo First Run is a one-shot wizard that prepares a fresh WordPress install with sensible defaults. Run it once after activation, then deactivate the plugin: it does not need to keep running.
 
-Every action is an independent checkbox. You pick what you want, click Run, and the wizard reports the result of each task.
+Every action is an independent checkbox. Nothing runs until you tick it and click Run, and the wizard reports the result of each task next to it.
 
 **What it does**
 
-* Deletes default demo content: the "Hello World" post, the "Sample Page" and the sample comment.
+* Moves the default demo content to the trash: the "Hello World" post, the "Sample Page" and the sample comment.
 * Deletes the Hello Dolly plugin, and Akismet when it is inactive.
-* Deletes unused themes, keeping only the active one.
+* Deletes unused themes, keeping the active one and its parent theme.
 * Cleans expired transients and orphan database rows.
 * Sets permalinks to /%postname%/.
 * Disables comments globally and closes pingbacks and trackbacks.
 * Sets the site timezone to the value you choose.
 * Discourages search engines (useful on staging).
-* Removes the default dashboard widgets for the current user.
+* Hides the default dashboard widgets for your account.
 * Creates a Privacy Policy page as a draft.
 * Creates Contact and About pages as drafts.
-* Sets a static "Home" page as the front page.
-* Can self-deactivate once you are done.
+* Sets a published static "Home" page as the front page.
+* Can deactivate itself once you are done.
+
+**Built to be safe on a site that is already in use**
+
+* The demo content is found by what WordPress created at install time (the hello-world and sample-page slugs, the address of the sample comment), never by its ID, so a post that only shares the ID of the old demo is left alone.
+* Posts, pages and comments go to the trash, so you can restore them from the usual WordPress screens.
+* Plugins and themes are deleted only by users who are allowed to delete them, and never on a multisite network, where every site shares them.
+* When the server needs FTP credentials to delete files, the task reports it and leaves the files in place.
 
 == Installation ==
 
@@ -44,7 +51,11 @@ Every action is an independent checkbox. You pick what you want, click Run, and 
 
 = Is it safe on an existing site? =
 
-The wizard targets default WordPress demo data and common defaults. Read each checkbox before running and uncheck anything you do not want to apply. Pages are created as drafts so nothing is published without your review.
+The wizard targets default WordPress demo data and common defaults. Read each checkbox before running and untick anything you do not want to apply. Demo content goes to the trash, and the Privacy Policy, Contact and About pages are created as drafts. The static front page task publishes a "Home" page, because a front page has to be published.
+
+= Who can run it? =
+
+Users who can manage options (administrators). Deleting plugins or themes also requires the permission to delete them, and those tasks are not offered on multisite.
 
 = Can I run it more than once? =
 
@@ -54,6 +65,10 @@ Yes. Each run only acts on the items currently ticked.
 
 No persistent options are created by the plugin. The pages and settings it produces are standard WordPress content and options that you can edit or revert at any time.
 
+= Is the plugin translated? =
+
+The plugin uses your WordPress site language. Translations are contributed through translate.wordpress.org, and the screens show in English until one exists for your language.
+
 == Screenshots ==
 
 1. First Run wizard with one checkbox per task.
@@ -62,22 +77,23 @@ No persistent options are created by the plugin. The pages and settings it produ
 
 == External services ==
 
-This plugin does not connect to or send data to any external service. All tasks run locally against your own WordPress installation. The donation links and the aGo Lab link in the admin page point to PayPal and ago.cl, opened only when the user clicks them.
+This plugin does not connect to or send data to any external service. All tasks run locally against your own WordPress installation.
+
+The settings screen links to external sites that only open when you click them: the aGo Lab website and documentation, the WordPress documentation, PageSpeed Insights, SSL Labs and PayPal donation pages. No data is transmitted automatically.
 
 == Privacy ==
 
-The plugin stores no persistent options of its own. It modifies standard WordPress settings (permalinks, comments, timezone, front page) and creates draft pages, all of which you can edit or revert. It sends no data to third parties. Since it stores nothing of its own, uninstall has nothing to remove.
+The plugin stores no persistent options of its own. It modifies standard WordPress settings (permalinks, comments, timezone, search engine visibility, front page), hides dashboard widgets for the user who runs that task, and creates pages, all of which you can edit or revert. It sends no data to third parties. Since it stores nothing of its own, uninstall has nothing to remove.
 
 == Changelog ==
 
 = 1.0.0 =
 * Initial release.
 * One-click first-run wizard with per-task checkboxes.
-* Clean demo content, Hello Dolly, inactive Akismet and unused themes.
-* Set permalinks, timezone, disable comments and pingbacks.
-* Create Privacy, Contact, About and static Home pages as drafts.
+* Demo content to the trash; Hello Dolly, inactive Akismet and unused themes deleted.
+* Set permalinks and timezone, disable comments and pingbacks.
+* Create Privacy, Contact and About pages as drafts, and a static Home page.
 * Clean expired transients and orphan database rows.
-* English, Spanish and Brazilian Portuguese included.
 
 == Upgrade Notice ==
 
